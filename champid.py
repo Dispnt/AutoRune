@@ -2,8 +2,6 @@ import json
 import requests
 
 
-
-
 def champIDInit():
     champ_list = requests.post("https://game.gtimg.cn/images/lol/act/img/js/heroList/hero_list.js").json()
     champ_id_list = {}
