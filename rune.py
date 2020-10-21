@@ -1,4 +1,6 @@
 import json
+import sys
+from requests.auth import HTTPBasicAuth
 import requests
 
 
@@ -27,6 +29,24 @@ precision_8000 = ["9101", "9111", "8009",
                 "8014", "8017", "8299"]  # 精密黄
 
 rune_listname = ['resove_8400','inspiration_8300','sorcery_8200','domination_8100','precision_8000']
+
+game_path = 'E:\\IdiotGame\\LeagueofLegends\\英雄联盟\\LeagueClient'
+def auth():
+    try:
+        server_info = open(game_path + "\\lockfile", "r").read().split(':')
+    except IOError:
+        sys.exit('Launch Your Game First')
+    else:
+        server_port = server_info[2]
+        server_pwd = server_info[3]
+        server_protocol = server_info[4]
+        # ProcessName:PID:WebServerPort:WebServerPwd:Protocol
+        server_url = f"{server_protocol}://127.0.0.1:{server_port}"
+        print(server_url, server_port, server_pwd)
+
+    summoner_info = requests.get(server_url + "/lol-summoner/v1/current-summoner", auth=HTTPBasicAuth('riot', server_pwd),
+                                 verify=False).json()
+    print(summoner_info['summonerId'])
 
 def runeIDs(championName ='Fizz'):
     summoner_info = requests.get("http://opgg.dispnt.com/api?championName="+championName).json()
