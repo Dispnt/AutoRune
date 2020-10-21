@@ -39,7 +39,7 @@ def runeIDs(championName ='Fizz'):
         if summoner_info[1]['1'][4] in globals()[list_name]:
             print("副系ID:"+list_name.split('_')[1])
             subId = list_name.split('_')[1]
-    return selectedPerkId,subId,primaryId
+    return selectedId,subId,primaryId
 
 
 python2json = {}
