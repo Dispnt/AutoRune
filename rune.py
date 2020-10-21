@@ -1,6 +1,7 @@
 import json
-
 import requests
+
+
 resove_8400 = ["8437", "8439", "8465",
              "8446", "8463", "8401",
              "8429", "8444", "8473",
@@ -27,21 +28,23 @@ precision_8000 = ["9101", "9111", "8009",
 
 rune_listname = ['resove_8400','inspiration_8300','sorcery_8200','domination_8100','precision_8000']
 
-#def output_json(championName):
-championName = 'Fizz'
-summoner_info = requests.get("http://opgg.dispnt.com/api?championName="+championName).json()
-selectedPerkId = summoner_info[1]['1']
-print(selectedPerkId)
-for listname in rune_listname:
-    if summoner_info[1]['1'][1] in globals()[listname]:
-        print("主系ID:"+listname.split('_')[1])
-        primaryStyleId = listname.split('_')[1]
-    if summoner_info[1]['1'][4] in globals()[listname]:
-        print("副系ID:"+listname.split('_')[1])
-        subStyleId = listname.split('_')[1]
+def runeIDs(championName ='Fizz'):
+    summoner_info = requests.get("http://opgg.dispnt.com/api?championName="+championName).json()
+    selectedId = summoner_info[1]['1']
+    print(selectedPerkId)
+    for list_name in rune_listname:
+        if summoner_info[1]['1'][1] in globals()[list_name]:
+            print("主系ID:"+list_name.split('_')[1])
+            primaryId = list_name.split('_')[1]
+        if summoner_info[1]['1'][4] in globals()[list_name]:
+            print("副系ID:"+list_name.split('_')[1])
+            subId = list_name.split('_')[1]
+    return selectedPerkId,subId,primaryId
+
 
 python2json = {}
 selectedPerkIdSecondPart = ['5008','5008','5003']
+(selectedPerkId,primaryStyleId,subStyleId) = runeIDs('Fizz')
 selectedPerkId.extend(selectedPerkIdSecondPart)
 print(selectedPerkId)
 python2json['current'] = True
