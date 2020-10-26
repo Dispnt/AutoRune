@@ -12,8 +12,7 @@ def champIDInit():
 
 def getChampName(champ_id):
     d2 = json.load(open('./champid', 'r'))
-    print(d2[champ_id])
     return d2[champ_id]
 
 # champIDInit()
-# getChampName('2')
+# getChampName('235')
