@@ -4,8 +4,8 @@ from time import sleep
 from champid import *
 from requests.auth import HTTPBasicAuth
 
-
 import urllib3
+
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 resove_8400 = ["8437", "8439", "8465",
@@ -36,7 +36,6 @@ rune_listname = ['resove_8400', 'inspiration_8300', 'sorcery_8200', 'domination_
 
 game_path = 'E:\\IdiotGame\\LeagueofLegends\\英雄联盟\\LeagueClient'
 
-
 try:
     server_info = open(game_path + "\\lockfile", "r").read().split(':')
 except IOError:
@@ -51,11 +50,11 @@ else:
 
     print(server_url, server_port, server_pwd)
 
+
 # summoner_info = requests.get(server_url + "/lol-summoner/v1/current-summoner",
 #                              auth=HTTPBasicAuth('riot', server_pwd),
 #                              verify=False).json()
 # print(summoner_info['summonerId'])
-
 
 
 def runeIDs(championName):
@@ -78,7 +77,7 @@ def runeJson(championName='Fizz'):
     (selectedPerkId, subStyleId, primaryStyleId) = runeIDs(championName)
     selectedPerkId.extend(selectedPerkIdSecondPart)
     rune_str['current'] = True
-    rune_str["name"] = "Test"
+    rune_str["name"] = "自动点的:" + championName
     rune_str["primaryStyleId"] = primaryStyleId
     rune_str["selectedPerkIds"] = selectedPerkId
     rune_str["subStyleId"] = subStyleId
@@ -92,15 +91,13 @@ def champSelect():
                                          auth=HTTPBasicAuth('riot', server_pwd),
                                          verify=False).json()
         champ_id = champ_select_info['actions'][0][0]['championId']
-        print(getChampName(str(champ_id)))
-    except Exception as e:
-         print('Waiting...')
+        return getChampName(str(champ_id))
+    except:
+        print('Waiting...')
 
 
-while True:
-    champSelect()
-    sleep(0.5)
-
-#
-# if auth():
-#     print(runeJson('Fizz'))
+post_body = runeJson(champSelect())
+champ_select_info = requests.post(server_url + "/lol-perks/v1/pages", data=post_body,
+                                  auth=HTTPBasicAuth('riot', server_pwd),
+                                  verify=False).json()
+print(champ_select_info)
