@@ -95,9 +95,14 @@ def champSelect():
     except:
         print('Waiting...')
 
-
-post_body = runeJson(champSelect())
-champ_select_info = requests.post(server_url + "/lol-perks/v1/pages", data=post_body,
-                                  auth=HTTPBasicAuth('riot', server_pwd),
-                                  verify=False).json()
-print(champ_select_info)
+while True:
+    try:
+        post_body = runeJson(champSelect())
+        champ_select_info = requests.post(server_url + "/lol-perks/v1/pages", data=post_body,
+                                          auth=HTTPBasicAuth('riot', server_pwd),
+                                          verify=False).json()
+        print(champ_select_info)
+        sleep(1)
+    except:
+        sleep(1)
+        pass
