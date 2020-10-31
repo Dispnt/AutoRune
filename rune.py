@@ -93,15 +93,28 @@ def champSelect():
         champ_id = champ_select_info['actions'][0][0]['championId']
         return getChampName(str(champ_id))
     except:
-        print('Waiting...')
+        pass
+
+
+def runeDelete():
+    champ_current_rune_page = requests.get(server_url + "/lol-perks/v1/currentpage",
+                                           auth=HTTPBasicAuth('riot', server_pwd),
+                                           verify=False).json()
+    champ_current_rune_page_id = champ_current_rune_page['id']
+    print(champ_current_rune_page_id)
+    if int(champ_current_rune_page_id) > 100:
+        champ_current_rune_page_del = requests.delete(
+            server_url + "/lol-perks/v1/pages/" + str(champ_current_rune_page_id),
+            auth=HTTPBasicAuth('riot', server_pwd), verify=False).json()
+        print(champ_current_rune_page_del)
 
 while True:
     sleep(1)
     try:
-        post_body = runeJson(champSelect())
-        champ_select_info = requests.post(server_url + "/lol-perks/v1/pages", data=post_body,
+        rune_json = runeJson(champSelect())
+        champ_select_info = requests.post(server_url + "/lol-perks/v1/pages", data=rune_json,
                                           auth=HTTPBasicAuth('riot', server_pwd),
                                           verify=False).json()
         print(champ_select_info)
     except:
-        pass
+        print('Waiting...')
