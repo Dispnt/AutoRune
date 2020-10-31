@@ -48,7 +48,7 @@ else:
     # ProcessName:PID:WebServerPort:WebServerPwd:Protocol
     server_url = f"{server_protocol}://127.0.0.1:{server_port}"
 
-    print(server_url, server_port, server_pwd)
+    print(server_url, server_pwd)
 
 
 # summoner_info = requests.get(server_url + "/lol-summoner/v1/current-summoner",
@@ -60,7 +60,7 @@ else:
 def runeIDs(championName):
     summoner_info = requests.get("http://opgg.dispnt.com/api?championName=" + championName).json()
     selectedId = summoner_info[1]['1']
-    print(selectedId)
+    print(summoner_info[0]['1'])
     for list_name in rune_listname:
         if selectedId[1] in globals()[list_name]:
             print("主系ID:" + list_name.split('_')[1])
@@ -77,7 +77,7 @@ def runeJson(championName='Fizz'):
     (selectedPerkId, subStyleId, primaryStyleId) = runeIDs(championName)
     selectedPerkId.extend(selectedPerkIdSecondPart)
     rune_str['current'] = True
-    rune_str["name"] = "自动点的:" + championName
+    rune_str["name"] = "自动点的：" + championName
     rune_str["primaryStyleId"] = primaryStyleId
     rune_str["selectedPerkIds"] = selectedPerkId
     rune_str["subStyleId"] = subStyleId
@@ -101,20 +101,26 @@ def runeDelete():
                                            auth=HTTPBasicAuth('riot', server_pwd),
                                            verify=False).json()
     champ_current_rune_page_id = champ_current_rune_page['id']
-    print(champ_current_rune_page_id)
     if int(champ_current_rune_page_id) > 100:
-        champ_current_rune_page_del = requests.delete(
-            server_url + "/lol-perks/v1/pages/" + str(champ_current_rune_page_id),
-            auth=HTTPBasicAuth('riot', server_pwd), verify=False).json()
-        print(champ_current_rune_page_del)
+        requests.delete(server_url + "/lol-perks/v1/pages/" + str(champ_current_rune_page_id),
+                        auth=HTTPBasicAuth('riot', server_pwd), verify=False).json()
+
 
 while True:
-    sleep(1)
+    sleep(0.5)
     try:
-        rune_json = runeJson(champSelect())
-        champ_select_info = requests.post(server_url + "/lol-perks/v1/pages", data=rune_json,
-                                          auth=HTTPBasicAuth('riot', server_pwd),
-                                          verify=False).json()
-        print(champ_select_info)
+        champName = champSelect()
+        champ_current_rune_page = requests.get(server_url + "/lol-perks/v1/currentpage",
+                                               auth=HTTPBasicAuth('riot', server_pwd),
+                                               verify=False).json()
+        champ_current_rune_page_name = champ_current_rune_page['name']
+        if champ_current_rune_page_name.split('：')[1] == champName:
+            pass
+        else:
+            runeDelete()
+            rune_json = runeJson(champName)
+            champ_select_info = requests.post(server_url + "/lol-perks/v1/pages", data=rune_json,
+                                              auth=HTTPBasicAuth('riot', server_pwd),
+                                              verify=False).json()
     except:
         print('Waiting...')
