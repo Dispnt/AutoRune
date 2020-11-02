@@ -71,7 +71,7 @@ def runeIDs(championName):
         if selectedId[4] in globals()[list_name]:
             print("副系:" + list_name.split('_')[2])
             for sub_rune in summoner_info[0]['1'][2:]:
-                print(rune)
+                print(sub_rune)
             subId = list_name.split('_')[1]
     return selectedId, subId, primaryId
 
