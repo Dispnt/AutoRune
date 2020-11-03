@@ -47,7 +47,6 @@ else:
     server_protocol = server_info[4]
     # ProcessName:PID:WebServerPort:WebServerPwd:Protocol
     server_url = f"{server_protocol}://127.0.0.1:{server_port}"
-
     print(server_url, server_pwd)
 
 
@@ -64,14 +63,14 @@ def runeIDs(championName):
         print(rune)
     for list_name in rune_listname:
         if selectedId[1] in globals()[list_name]:
-            print("主系:" + list_name.split('_')[2])
+            print(f"{getattr(runeColor, list_name.split('_')[0])}---主系---{list_name.split('_')[2]} ")
             for paimary_rune in summoner_info[0]['1'][:4]:
-                print(paimary_rune)
+                print(f"{getattr(runeColor, list_name.split('_')[0])}{paimary_rune}", end="\t")
             primaryId = list_name.split('_')[1]
         if selectedId[4] in globals()[list_name]:
-            print("副系:" + list_name.split('_')[2])
-            for sub_rune in summoner_info[0]['1'][2:]:
-                print(sub_rune)
+            print(f"\n{getattr(runeColor, list_name.split('_')[0])}---副系---{list_name.split('_')[2]}")
+            for sub_rune in summoner_info[0]['1'][4:]:
+                print(f"{getattr(runeColor, list_name.split('_')[0])}{sub_rune}", end="\t")
             subId = list_name.split('_')[1]
     return selectedId, subId, primaryId
 
