@@ -1,49 +1,104 @@
+import re
 import sys
+import urllib3
 from champid import *
 from time import sleep
+from bs4 import BeautifulSoup
 from requests.auth import HTTPBasicAuth
-
-import urllib3
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
-class RuneColor:
-    resove = '\033[32m'
-    inspiration = '\033[34m'
-    sorcery = '\033[35m'
-    domination = '\033[31m'
-    precision = '\033[33m'
-    WARNING = '\033[93m'
+def getChampName(champ_id):
+    d2 = json.load(open('./champid', 'r'))
+    return d2[champ_id]
 
 
-resove_8400_坚决 = ["8437", "8439", "8465",
-                  "8446", "8463", "8401",
-                  "8429", "8444", "8473",
-                  "8451", "8453", "8242"]
+def getRuneIDs(champion_name):
+    if usingApi == True:
+        summoner_info = requests.get("http://opgg.dispnt.com/api?champion_name=" + champion_name).json()
+    else:
+        summoner_info = genRuneJson(champion_name).json()
+    rune_selected = summoner_info[1]['1']
+    print(f"{champion_name} 的 符文")
+    for list_name in rune_listname:
+        if rune_selected[1] in globals()[list_name]:
+            print(f"{getattr(RuneColor, list_name.split('_')[0])}---主系---  {list_name.split('_')[2]} ")
+            for paimary_rune in summoner_info[0]['1'][:4]:
+                print(f"{getattr(RuneColor, list_name.split('_')[0])}{paimary_rune}", end="  ")
+            primary_id = list_name.split('_')[1]
+        if rune_selected[4] in globals()[list_name]:
+            print(f"\n{getattr(RuneColor, list_name.split('_')[0])}---副系---  {list_name.split('_')[2]}")
+            for sub_rune in summoner_info[0]['1'][4:]:
+                print(f"{getattr(RuneColor, list_name.split('_')[0])}{sub_rune}", end="  ")
+            sub_id = list_name.split('_')[1]
+    return rune_selected, sub_id, primary_id
 
-inspiration_8300_启迪 = ["8351", "8360", "8358",
-                       "8306", "8304", "8313",
-                       "8321", "8316", "8345",
-                       "8347", "8410", "8352"]
 
-sorcery_8200_巫术 = ["8214", "8229", "8230",
-                   "8224", "8226", "8275",
-                   "8210", "8234", "8233",
-                   "8237", "8232", "8236"]
+def genRuneJson(champion_name):
+    rune_name = {}
+    rune_id = {}
+    rune_img_link = []
+    url = "http://www.op.gg/champion/" + champion_name + "/statistics/"
+    r = requests.get(url, headers=header).text
+    soup = BeautifulSoup(r, 'html.parser')
+    RuneHtml = soup.find('div', {'class': 'rune-setting'})
+    SelectedRuneHtml = RuneHtml.find_all(class_='perk-page__item--active')
+    key_and_count = [1, 1]
+    for SelectedRune in SelectedRuneHtml:
+        rune_img_link.append(SelectedRune.find('img')['src'])
+        if key_and_count[1] <= 6:
+            rune_name.setdefault(key_and_count[0], []).append(SelectedRune.find('img')['alt'])
+        else:
+            key_and_count = [key_and_count[0] + 1, 1]
+            rune_name.setdefault(key_and_count[0], []).append(SelectedRune.find('img')['alt'])
+        key_and_count[1] = key_and_count[1] + 1
+        key_and_count = [1, 1]
+    for SelectedRune in rune_img_link:
+        if key_and_count[1] <= 6:
+            rune_id.setdefault(key_and_count[0], []).append(re.findall(r"\d\d\d\d", SelectedRune)[0])
+        else:
+            key_and_count = [key_and_count[0] + 1, 1]
+            rune_id.setdefault(key_and_count[0], []).append(re.findall(r"\d\d\d\d", SelectedRune)[0])
+        key_and_count[1] = key_and_count[1] + 1
+    return rune_name, rune_id
 
-domination_8100_主宰 = ["8112", "8124", "8128", "9923",
-                      "8126", "8139", "8143",
-                      "8136", "8120", "8138",
-                      "8135", "8134", "8105", "8106"]
 
-precision_8000_精密 = ["9101", "9111", "8009",
-                     "9104", "9105", "9103",
-                     "8014", "8017", "8299"]
 
-rune_listname = ['resove_8400_坚决', 'inspiration_8300_启迪', 'sorcery_8200_巫术', 'domination_8100_主宰', 'precision_8000_精密']
+def genRunePost(champion_name='Fizz'):
+    rune_str = {}
+    selectedPerkIdSecondPart = ['5008', '5008', '5003']
+    (selectedPerkId, subStyleId, primaryStyleId) = getRuneIDs(champion_name)
+    selectedPerkId.extend(selectedPerkIdSecondPart)
+    rune_str['current'] = True
+    rune_str["name"] = "自动点的：" + champion_name
+    rune_str["primaryStyleId"] = primaryStyleId
+    rune_str["selectedPerkIds"] = selectedPerkId
+    rune_str["subStyleId"] = subStyleId
+    rune_json = json.dumps(rune_str)
+    return rune_json
 
-game_path = 'E:\\IdiotGame\\LeagueofLegends\\英雄联盟\\LeagueClient'
+
+def getSelectChampName():
+    try:
+        champ_select_info = requests.get(server_url + "/lol-champ-select/v1/session",
+                                         auth=HTTPBasicAuth('riot', server_pwd),
+                                         verify=False).json()
+        champ_id = champ_select_info['actions'][0][0]['championId']
+        return getChampName(str(champ_id))
+    except:
+        pass
+
+
+def delRunePg():
+    champ_current_rune_page = requests.get(server_url + "/lol-perks/v1/currentpage",
+                                           auth=HTTPBasicAuth('riot', server_pwd),
+                                           verify=False).json()
+    champ_current_rune_page_id = champ_current_rune_page['id']
+    if int(champ_current_rune_page_id) > 100:
+        requests.delete(server_url + "/lol-perks/v1/pages/" + str(champ_current_rune_page_id),
+                        auth=HTTPBasicAuth('riot', server_pwd), verify=False).json()
+
 
 try:
     server_info = open(game_path + "\\lockfile", "r").read().split(':')
@@ -58,71 +113,10 @@ else:
     server_url = f"{server_protocol}://127.0.0.1:{server_port}"
     print(server_url, server_pwd)
 
-
-# summoner_info = requests.get(server_url + "/lol-summoner/v1/current-summoner",
-#                              auth=HTTPBasicAuth('riot', server_pwd),
-#                              verify=False).json()
-# print(summoner_info['summonerId'])
-
-
-def runeIDs(championName):
-    summoner_info = requests.get("http://opgg.dispnt.com/api?championName=" + championName).json()
-    selectedId = summoner_info[1]['1']
-
-    print(f"{championName} 的 符文")
-    for list_name in rune_listname:
-        if selectedId[1] in globals()[list_name]:
-            print(f"{getattr(RuneColor, list_name.split('_')[0])}---主系---  {list_name.split('_')[2]} ")
-            for paimary_rune in summoner_info[0]['1'][:4]:
-                print(f"{getattr(RuneColor, list_name.split('_')[0])}{paimary_rune}", end="  ")
-            primaryId = list_name.split('_')[1]
-        if selectedId[4] in globals()[list_name]:
-            print(f"\n{getattr(RuneColor, list_name.split('_')[0])}---副系---  {list_name.split('_')[2]}")
-            for sub_rune in summoner_info[0]['1'][4:]:
-                print(f"{getattr(RuneColor, list_name.split('_')[0])}{sub_rune}", end="  ")
-            subId = list_name.split('_')[1]
-    return selectedId, subId, primaryId
-
-
-def runeJson(championName='Fizz'):
-    rune_str = {}
-    selectedPerkIdSecondPart = ['5008', '5008', '5003']
-    (selectedPerkId, subStyleId, primaryStyleId) = runeIDs(championName)
-    selectedPerkId.extend(selectedPerkIdSecondPart)
-    rune_str['current'] = True
-    rune_str["name"] = "自动点的：" + championName
-    rune_str["primaryStyleId"] = primaryStyleId
-    rune_str["selectedPerkIds"] = selectedPerkId
-    rune_str["subStyleId"] = subStyleId
-    rune_json = json.dumps(rune_str)
-    return rune_json
-
-
-def champSelect():
-    try:
-        champ_select_info = requests.get(server_url + "/lol-champ-select/v1/session",
-                                         auth=HTTPBasicAuth('riot', server_pwd),
-                                         verify=False).json()
-        champ_id = champ_select_info['actions'][0][0]['championId']
-        return getChampName(str(champ_id))
-    except:
-        pass
-
-
-def runeDelete():
-    champ_current_rune_page = requests.get(server_url + "/lol-perks/v1/currentpage",
-                                           auth=HTTPBasicAuth('riot', server_pwd),
-                                           verify=False).json()
-    champ_current_rune_page_id = champ_current_rune_page['id']
-    if int(champ_current_rune_page_id) > 100:
-        requests.delete(server_url + "/lol-perks/v1/pages/" + str(champ_current_rune_page_id),
-                        auth=HTTPBasicAuth('riot', server_pwd), verify=False).json()
-
-
 while True:
-    sleep(0.5)
+    sleep(1)
     try:
-        champName = champSelect()
+        champName = getSelectChampName()
         champ_current_rune_page = requests.get(server_url + "/lol-perks/v1/currentpage",
                                                auth=HTTPBasicAuth('riot', server_pwd),
                                                verify=False).json()
@@ -130,8 +124,8 @@ while True:
         if champ_current_rune_page_name.split('：')[1] == champName:
             pass
         else:
-            runeDelete()
-            rune_json = runeJson(champName)
+            delRunePg()
+            rune_json = genRunePost(champName)
             champ_select_info = requests.post(server_url + "/lol-perks/v1/pages", data=rune_json,
                                               auth=HTTPBasicAuth('riot', server_pwd),
                                               verify=False).json()
