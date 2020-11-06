@@ -10,7 +10,7 @@ class RuneColor:
     sorcery = '\033[35m'
     domination = '\033[31m'
     precision = '\033[33m'
-    WARNING = '\033[93m'
+    END = '\033[39m'
 
 
 header = {
