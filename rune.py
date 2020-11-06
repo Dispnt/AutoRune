@@ -15,12 +15,12 @@ def getChampName(champ_id):
 
 
 def getRuneIDs(champion_name):
-    # if usingApi == True:
-    summoner_info = requests.get("http://opgg.dispnt.com/api?championName=" + champion_name).json()
-    # else:
-    # summoner_info = json.dumps(genRuneJson(champion_name))
+    if champion_name is not None:
+        print(f"读取 {champion_name} 的 符文")
+        summoner_info = requests.get("http://opgg.dispnt.com/api?championName=" + champion_name).json()
+    else:
+        pass
     rune_selected = summoner_info[1]['1']
-    print(f"{champion_name} 的 符文")
     for list_name in rune_listname:
         if rune_selected[1] in globals()[list_name]:
             print(f"\n{getattr(RuneColor, list_name.split('_')[0])}---主系---  {list_name.split('_')[2]} ")
