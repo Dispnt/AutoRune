@@ -48,4 +48,4 @@ precision_8000_精密 = ["9101", "9111", "8009",
                      "8014", "8017", "8299"]
 rune_listname = ['resove_8400_坚决', 'inspiration_8300_启迪', 'sorcery_8200_巫术', 'domination_8100_主宰', 'precision_8000_精密']
 
-champIDInit()
+# champIDInit()
