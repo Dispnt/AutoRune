@@ -16,7 +16,7 @@ def getChampName(champ_id):
 
 def getRuneIDs(champion_name):
     if champion_name is not None:
-        print(f"读取 {champion_name} 的 符文")
+        print(f"Loading {champion_name}'s Rune...")
         summoner_info = requests.get("http://opgg.dispnt.com/api?championName=" + champion_name).json()
     else:
         pass
@@ -127,7 +127,7 @@ if __name__ == "__main__":
                 pass
             else:
                 delRunePg()
-                rune_json = genRunePost(champName)  # NoneType ERR
+                rune_json = genRunePost(champName)
                 champ_select_info = requests.post(server_url + "/lol-perks/v1/pages", data=rune_json,
                                                   auth=HTTPBasicAuth('riot', server_pwd),
                                                   verify=False).json()
