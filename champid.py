@@ -2,7 +2,7 @@ import json
 import requests
 
 game_path = 'E:\\IdiotGame\\LeagueofLegends\\英雄联盟\\LeagueClient'
-usingApi = True
+# usingApi = True
 
 class RuneColor:
     resove = '\033[32m'
