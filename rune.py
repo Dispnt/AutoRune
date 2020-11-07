@@ -18,7 +18,7 @@ def getRuneIDs(champion_name):
     if champion_name is not None:
         print(f"Loading {champion_name}'s Rune...")
         if usingApi is True:
-            summoner_info = requests.get("http://127.0.0.1:5000/api?championName=" + champion_name).json()
+            summoner_info = requests.get("http://opgg.dispnt.com/api?championName=" + champion_name).json()
         else:
             summoner_info = genRuneJson(champion_name)
     else:
