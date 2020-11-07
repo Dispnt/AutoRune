@@ -17,7 +17,10 @@ def getChampName(champ_id):
 def getRuneIDs(champion_name):
     if champion_name is not None:
         print(f"Loading {champion_name}'s Rune...")
-        summoner_info = requests.get("http://opgg.dispnt.com/api?championName=" + champion_name).json()
+        if usingApi is True:
+            summoner_info = requests.get("http://127.0.0.1:5000/api?championName=" + champion_name).json()
+        else:
+            summoner_info = genRuneJson(champion_name)
     else:
         pass
     rune_selected = summoner_info[1]['1']
@@ -39,8 +42,8 @@ def getRuneIDs(champion_name):
 
 def genRuneJson(champion_name):
     rune_name = {}
+    rune_link = []
     rune_id = {}
-    rune_img_link = []
     url = "http://www.op.gg/champion/" + champion_name + "/statistics/"
     r = requests.get(url, headers=header).text
     soup = BeautifulSoup(r, 'html.parser')
@@ -48,20 +51,20 @@ def genRuneJson(champion_name):
     SelectedRuneHtml = RuneHtml.find_all(class_='perk-page__item--active')
     key_and_count = [1, 1]
     for SelectedRune in SelectedRuneHtml:
-        rune_img_link.append(SelectedRune.find('img')['src'])
+        rune_link.append(SelectedRune.find('img')['src'])
         if key_and_count[1] <= 6:
-            rune_name.setdefault(key_and_count[0], []).append(SelectedRune.find('img')['alt'])
+            rune_name.setdefault(str(key_and_count[0]), []).append(SelectedRune.find('img')['alt'])
         else:
             key_and_count = [key_and_count[0] + 1, 1]
-            rune_name.setdefault(key_and_count[0], []).append(SelectedRune.find('img')['alt'])
+            rune_name.setdefault(str(key_and_count[0]), []).append(SelectedRune.find('img')['alt'])
         key_and_count[1] = key_and_count[1] + 1
-        key_and_count = [1, 1]
-    for SelectedRune in rune_img_link:
+    key_and_count = [1, 1]
+    for SelectedRune in rune_link:
         if key_and_count[1] <= 6:
-            rune_id.setdefault(key_and_count[0], []).append(re.findall(r"\d\d\d\d", SelectedRune)[0])
+            rune_id.setdefault(str(key_and_count[0]), []).append(re.findall(r"\d\d\d\d", SelectedRune)[0])
         else:
             key_and_count = [key_and_count[0] + 1, 1]
-            rune_id.setdefault(key_and_count[0], []).append(re.findall(r"\d\d\d\d", SelectedRune)[0])
+            rune_id.setdefault(str(key_and_count[0]), []).append(re.findall(r"\d\d\d\d", SelectedRune)[0])
         key_and_count[1] = key_and_count[1] + 1
     return rune_name, rune_id
 
@@ -123,7 +126,7 @@ if __name__ == "__main__":
                                                    auth=HTTPBasicAuth('riot', server_pwd),
                                                    verify=False).json()
             champ_current_rune_page_name = champ_current_rune_page['name']
-            if champ_current_rune_page_name.split('：')[1] == champName:
+            if champ_current_rune_page_name.split ('：')[1] == champName:
                 pass
             else:
                 delRunePg()
@@ -131,5 +134,5 @@ if __name__ == "__main__":
                 champ_select_info = requests.post(server_url + "/lol-perks/v1/pages", data=rune_json,
                                                   auth=HTTPBasicAuth('riot', server_pwd),
                                                   verify=False).json()
-        except:
-            print('Waiting...')
+        except Exception as e:
+            print(e)
