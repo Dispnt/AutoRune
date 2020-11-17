@@ -138,7 +138,7 @@ if __name__ == "__main__":
                                                    auth=HTTPBasicAuth('riot', server_pwd),
                                                    verify=False).json()
             champ_current_rune_page_name = champ_current_rune_page['name']
-            if champ_current_rune_page_name.split ('：')[1] == champName:
+            if champ_current_rune_page_name[-3:] == champName[-3:]:
                 pass
             else:
                 delRunePg()
