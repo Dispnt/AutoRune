@@ -83,7 +83,6 @@ def genRunePost(champion_name):
 
 
 def getSelectChampName():
-    try:
         champ_select_info = requests.get(server_url + "/lol-champ-select/v1/session",
                                          auth=HTTPBasicAuth('riot', server_pwd),
                                          verify=False).json()
@@ -91,8 +90,7 @@ def getSelectChampName():
         for summoner_pick in summoner_list:
             if summoner_pick['summonerId'] == summoner_id:
                 return getChampName(str(summoner_pick['championId']))
-    except:
-        pass
+
 
 
 def delRunePg():
@@ -128,7 +126,8 @@ if __name__ == "__main__":
     while True:
         sleep(0.5)
         try:
-            match_accept = requests.post(server_url + "/lol-matchmaking/v1/ready-check/accept",auth=HTTPBasicAuth('riot', server_pwd),verify=False).json()
+            match_accept = requests.post(server_url + "/lol-matchmaking/v1/ready-check/accept",
+                                         auth=HTTPBasicAuth('riot', server_pwd),verify=False).json()
         except:
             print('---ACCEPTED---')
 
@@ -146,8 +145,13 @@ if __name__ == "__main__":
                 champ_select_info = requests.post(server_url + "/lol-perks/v1/pages", data=rune_json,
                                                   auth=HTTPBasicAuth('riot', server_pwd),
                                                   verify=False).json()
-        except:
-            print("Waiting...")
-
+        except IndexError:
+            print("Waiting : select a champion...")
+        except TypeError:
+            print("Waiting : select a champion...")
+        except KeyError:
+            print("Waiting : select a champion...")
+        except json.decoder.JSONDecodeError:
+            pass
     # UnboundLocalError: local variable 'summoner_info' referenced before assignment = 未进入选择页面
-    # IndexError: list index out of range = 未删除旧符文
+    # TypeError: 'NoneType' object is not subscriptable = 未删除旧符文
