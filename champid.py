@@ -2,17 +2,7 @@ import json
 import requests
 
 game_path = 'E:\\IdiotGame\\LeagueofLegends\\英雄联盟\\LeagueClient'
-usingApi = True
-
-
-class RuneColor:
-    resove = '\033[32m'
-    inspiration = '\033[34m'
-    sorcery = '\033[35m'
-    domination = '\033[31m'
-    precision = '\033[33m'
-    END = '\033[39m'
-
+usingApi = False
 
 header = {
     'User-Agent': 'Mozilla/5.0 (Linux; Android 4.4.2; R8207 Build/KTU84P) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/30.0.0.0 Mobile Safari/537.36; OP.GG Mobile Android (4.8.0); X-DEVICE-WIDTH=540',

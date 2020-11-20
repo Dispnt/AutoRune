@@ -5,7 +5,6 @@ from champid import *
 from time import sleep
 from bs4 import BeautifulSoup
 from requests.auth import HTTPBasicAuth
-
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
@@ -26,15 +25,15 @@ def getRuneIDs(champion_name):
     rune_selected = summoner_info[1]['1']
     for list_name in rune_listname:
         if rune_selected[1] in globals()[list_name]:
-            print(f"\n{getattr(RuneColor, list_name.split('_')[0])}---主系---  {list_name.split('_')[2]} ")
+            print(f"\n---主系---  {list_name.split('_')[2]} ")
             for primary_rune in summoner_info[0]['1'][:4]:
-                print(f"{getattr(RuneColor, list_name.split('_')[0])}{primary_rune}{getattr(RuneColor, 'END')}",
+                print(f"{primary_rune}",
                       end="  ")
             primary_id = list_name.split('_')[1]
         if rune_selected[4] in globals()[list_name]:
-            print(f"\n{getattr(RuneColor, list_name.split('_')[0])}---副系---  {list_name.split('_')[2]}")
+            print(f"\n---副系---  {list_name.split('_')[2]}")
             for sub_rune in summoner_info[0]['1'][4:]:
-                print(f"{getattr(RuneColor, list_name.split('_')[0])}{sub_rune}{getattr(RuneColor, 'END')}", end="  ")
+                print(f"{sub_rune}", end="  ")
             sub_id = list_name.split('_')[1]
     print('\n')
     return rune_selected, sub_id, primary_id
@@ -75,7 +74,7 @@ def genRunePost(champion_name):
     (selectedPerkId, subStyleId, primaryStyleId) = getRuneIDs(champion_name)
     selectedPerkId.extend(selectedPerkIdSecondPart)
     rune_str['current'] = True
-    rune_str["name"] = "自动点的：" + champion_name
+    rune_str["name"] = "AutoRune：" + champion_name
     rune_str["primaryStyleId"] = primaryStyleId
     rune_str["selectedPerkIds"] = selectedPerkId
     rune_str["subStyleId"] = subStyleId
@@ -115,7 +114,7 @@ else:
     server_protocol = server_info[4]
     # ProcessName:PID:WebServerPort:WebServerPwd:Protocol
     server_url = f"{server_protocol}://127.0.0.1:{server_port}"
-    print(server_url, server_pwd)
+    print(server_url, server_pwd,'\nUsing API =',str(usingApi))
 
 if __name__ == "__main__":
     while True:
@@ -134,5 +133,5 @@ if __name__ == "__main__":
                 champ_select_info = requests.post(server_url + "/lol-perks/v1/pages", data=rune_json,
                                                   auth=HTTPBasicAuth('riot', server_pwd),
                                                   verify=False).json()
-        except Exception as e:
-            print(e)
+        except:
+            print('Waiting...')
