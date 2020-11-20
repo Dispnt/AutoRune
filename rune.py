@@ -120,6 +120,13 @@ if __name__ == "__main__":
     while True:
         sleep(0.5)
         try:
+            match_accept = requests.post(server_url + "/lol-matchmaking/v1/ready-check/accept",
+                                              auth=HTTPBasicAuth('riot', server_pwd),
+                                              verify=False).json()
+        except:
+            print('---ACCEPTED---')
+
+        try:
             champName = getSelectChampName()
             champ_current_rune_page = requests.get(server_url + "/lol-perks/v1/currentpage",
                                                    auth=HTTPBasicAuth('riot', server_pwd),
