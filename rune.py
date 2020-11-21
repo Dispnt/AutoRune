@@ -153,5 +153,3 @@ if __name__ == "__main__":
             print("Waiting : select a champion...")
         except json.decoder.JSONDecodeError:
             pass
-    # UnboundLocalError: local variable 'summoner_info' referenced before assignment = 未进入选择页面
-    # TypeError: 'NoneType' object is not subscriptable = 未删除旧符文
