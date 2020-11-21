@@ -87,8 +87,10 @@ def getSelectChampName():
         champ_select_info = requests.get(server_url + "/lol-champ-select/v1/session",
                                          auth=HTTPBasicAuth('riot', server_pwd),
                                          verify=False).json()
-        champ_id = champ_select_info['actions'][0][0]['championId']
-        return getChampName(str(champ_id))
+        summoner_list = champ_select_info['myTeam']
+        for summoner_pick in summoner_list:
+            if summoner_pick['summonerId'] == summoner_id:
+                return getChampName(str(summoner_pick['championId']))
     except:
         pass
 
@@ -116,13 +118,17 @@ else:
     server_url = f"{server_protocol}://127.0.0.1:{server_port}"
     print(server_url, server_pwd,'\nUsing API =',str(usingApi))
 
+    summoner_info = requests.get(server_url + "/lol-summoner/v1/current-summoner",
+                                 auth=HTTPBasicAuth('riot', server_pwd),
+                                 verify=False).json()
+    summoner_id = summoner_info['summonerId']
+
+
 if __name__ == "__main__":
     while True:
         sleep(0.5)
         try:
-            match_accept = requests.post(server_url + "/lol-matchmaking/v1/ready-check/accept",
-                                              auth=HTTPBasicAuth('riot', server_pwd),
-                                              verify=False).json()
+            match_accept = requests.post(server_url + "/lol-matchmaking/v1/ready-check/accept",auth=HTTPBasicAuth('riot', server_pwd),verify=False).json()
         except:
             print('---ACCEPTED---')
 
@@ -141,4 +147,7 @@ if __name__ == "__main__":
                                                   auth=HTTPBasicAuth('riot', server_pwd),
                                                   verify=False).json()
         except:
-            print('Waiting...')
+            print("Waiting...")
+
+    # UnboundLocalError: local variable 'summoner_info' referenced before assignment = 未进入选择页面
+    # IndexError: list index out of range = 未删除旧符文
