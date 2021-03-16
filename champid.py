@@ -1,7 +1,7 @@
 import json
 import requests
 
-game_path = 'E:\\IdiotGame\\LeagueofLegends\\英雄联盟\\LeagueClient'
+game_path = 'E:\IdiotGame\LOL\英雄联盟\LeagueClient'
 usingApi = False
 
 header = {
@@ -11,7 +11,7 @@ header = {
 
 
 def champIDInit():
-    champ_list = requests.post("https://game.gtimg.cn/images/lol/act/img/js/heroList/hero_list.js").json()
+    champ_list = requests.post("http://game.gtimg.cn/images/lol/act/img/js/heroList/hero_list.js").json()
     champ_id_list = {}
     for champ in champ_list['hero']:
         champ_id_list[champ["heroId"]] = champ["alias"]
@@ -39,4 +39,4 @@ precision_8000_精密 = ["9101", "9111", "8009",
                      "8014", "8017", "8299"]
 rune_listname = ['resove_8400_坚决', 'inspiration_8300_启迪', 'sorcery_8200_巫术', 'domination_8100_主宰', 'precision_8000_精密']
 
-# champIDInit()
+champIDInit()

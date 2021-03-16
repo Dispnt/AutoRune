@@ -19,7 +19,8 @@ def getRuneIDs(champion_name):
         if usingApi is True:
             summoner_info = requests.get("http://opgg.dispnt.com/api?championName=" + champion_name).json()
         else:
-            summoner_info = genRuneJson(champion_name)
+
+            summoner_info = genRuneJson(champion_name,getMode())
     else:
         pass
     rune_selected = summoner_info[1]['1']
@@ -38,12 +39,28 @@ def getRuneIDs(champion_name):
     print('\n')
     return rune_selected, sub_id, primary_id
 
+def getMode():
+    mode = ""
+    try:
+        game_session = requests.post(server_url + "/lol-matchmaking/v1/ready-check/accept",
+                                     auth=HTTPBasicAuth('riot', server_pwd),verify=False).json()
+        mode = game_session["gameData"]["queue"]["gameMode"]
+    except:
+        pass
+    if mode == "ARAM":
+        return "aram"
+    else:
+        return "derank"
 
-def genRuneJson(champion_name):
+
+def genRuneJson(champion_name,mode):
     rune_name = {}
     rune_link = []
     rune_id = {}
-    url = "http://www.op.gg/champion/" + champion_name + "/statistics/"
+    if mode == "aram":
+        url = "http://www.op.gg/urf/" + champion_name + "/statistics/"
+    else:
+        url = "http://www.op.gg/champion/" + champion_name + "/statistics/"
     r = requests.get(url, headers=header).text
     soup = BeautifulSoup(r, 'html.parser')
     RuneHtml = soup.find('div', {'class': 'rune-setting'})
