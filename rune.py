@@ -42,7 +42,7 @@ def getRuneIDs(champion_name):
 def getMode():
     mode = ""
     try:
-        game_session = requests.post(server_url + "/lol-matchmaking/v1/ready-check/accept",
+        game_session = requests.post(server_url + "/lol-gameflow/v1/session",
                                      auth=HTTPBasicAuth('riot', server_pwd),verify=False).json()
         mode = game_session["gameData"]["queue"]["gameMode"]
     except:
